@@ -1,11 +1,22 @@
+import java.util.Random;
+
 public class Agente {
     private static int contador;
     private int id;
     private Mensaje mensaje;
+    private int x, y;
+    private ColaDeMensajes cola;
+    private boolean seMovioAnterior;
 
     public Agente() {
+        Random rn = new Random();
+        this.x = rn.nextInt(1000);
+        this.y = rn.nextInt(1000);
         this.id = contador;
         contador++;
+        this.mensaje = null;
+        this.cola = null;
+
     }
 
     public int getID() {
