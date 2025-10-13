@@ -1,9 +1,11 @@
 public class Sala {
+    
     private String parametros;
     private int filas; //Parámetro A
     private int columnas; //Parámetro B
     private int pasillos;  //Parámetro C
     private Asiento[][] asientos;
+
     public Sala(String parametros) {
         try {
             this.parametros = parametros;
@@ -29,6 +31,11 @@ public class Sala {
             }
             else {
                 this.pasillos = 0;
+            }
+
+            // Evita que haya parametros negativos
+            if (filas < 0 || columnas < 0 || pasillos < 0) {
+                throw new IllegalArgumentException("No pueden haber parámetros negativos. Sea más cuidadoso.");
             }
 
             // Evita que haya mas pasillos que columnas
@@ -74,6 +81,36 @@ public class Sala {
                 System.out.print(asiento + " ");
             }
             System.out.println();
+        }
+    }
+
+    public void establecerCentrales() {
+        int centro = 0;
+        if (columnas % 2 == 0)  {
+            centro = columnas / 2;
+        }
+        else {
+            centro = columnas / 2 + 1;
+        }
+        int der = centro + 1;
+        int izq = centro - 1;
+        for (int i = 0; i < asientos.length; i++) {
+            if (pasillos != 0) {
+                if (asientos[i][centro].getEsPasillo() == false) {
+                    asientos[i][centro].setEsCentral(true);
+                }
+                while (asientos[i][der].getEsPasillo() == false) {
+                    asientos[i][der].setEsCentral(true);
+                    der++;
+                }
+                while (asientos[i][izq].getEsPasillo() == false) {
+                    asientos[i][izq].setEsCentral(true);
+                    i--;
+                }
+            }
+            else {
+                asientos[i][centro].setEsCentral(true);
+            }
         }
     }
 

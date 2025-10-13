@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        LectorArchivos.leerReglas("Reglas.csv");
+        LectorArchivos.leerReglas("Reglas.csv"); //args[1]
 
         for (Persona p : LectorArchivos.getPersonas()) {
             System.out.println("Nombre: " + p.getNombre());
@@ -14,7 +14,7 @@ public class Main {
             System.out.println("--------------------");
         }
 
-        Sala sala = new Sala("8x10x1");
+        Sala sala = new Sala("2x2x1"); //args[0]
         sala.visualizador();
     }
 }

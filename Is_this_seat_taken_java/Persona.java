@@ -8,12 +8,23 @@ public class Persona {
     private String al_lado;
     private String odia_olor;
     private boolean esFeliz;
+    private String[] datos; // Indispensable para el log
+    private int problemas;
+    private int variableAlegria;
 
     public Persona() {
-    }
-    
-    public boolean getEsFeliz() {
-        return this.esFeliz;
+        this.variableAlegria = 0;
+        this.datos = new String[10];
+        this.nombre = "";
+        this.edad = 1;
+        this.fila = "";
+        this.columna = "";
+        this.huele_a = "";
+        this.tiene = "";
+        this.al_lado = "";
+        this.odia_olor = "";
+        this.problemas = 0;
+        this.esFeliz = false;
     }
 
     // Setters
@@ -22,7 +33,13 @@ public class Persona {
     }
 
     public void setEdad(String edad) {
-        this.edad = Integer.parseInt(extraerValor(edad));
+        int nuevaEdad = Integer.parseInt(extraerValor(edad));
+        if (nuevaEdad > 0) {
+            this.edad = nuevaEdad;
+        }
+        else {
+            System.out.println("Edad inválida.Edad predeterminada aplicada: 1");
+        }
     }
 
     public void setFila(String fila) {
@@ -82,5 +99,22 @@ public class Persona {
     }
     public String getOdiaOlor() {
         return odia_olor;
+    }
+    public boolean getEsFeliz() {
+        return this.esFeliz;
+    }
+
+    // Metodos relacionados al inspector
+    public void setEstadoAlegria(String estadoAlegria, int cantidadProblemas) {
+        this.problemas += cantidadProblemas;
+        if(this.problemas == 0) {
+            this.datos[this.variableAlegria] = (this.nombre + " es feliz");
+            this.esFeliz = true;
+        }
+        else {
+            this.datos[this.variableAlegria] = (estadoAlegria);
+            this.variableAlegria++;
+            this.esFeliz = false;
+        }
     }
 }
