@@ -2,9 +2,9 @@ nombre:Jose,edad:28,columna:!pasillo,al_lado:nombre:Juan
 nombre:Juan,edad:30,al_lado:nombre:Jose,columna:pasillo
 nombre:Axel,edad:22,tiene:palomitas,fila:2,columna:!pasillo
 nombre:Ana,edad:21,odia_olor:perfume,al_lado:tiene:palomitas
-nombre:Cristina,edad:7,al_lado:nombre:Sofia
+nombre:Cristina,edad:7,al_lado:nombre:!Sofia
 nombre:Sofia,edad:20,huele_a:perfume
 nombre:Perla,edad:8,al_lado:nombre:Sofia,huele_a:sucio
 nombre:Lucia,edad:17,tiene:celular_encendido,odia_olor:sucio
 nombre:Sindy,edad:26,columna:!pasillo,fila:1,tiene:celular_encendido
-nombre:Rodolfo,edad:40,tiene:sombrero,fila:primera,columna:pasillo,odia_olor:todos
+nombre:Rodolfo,edad:40,tiene:sombrero,fila:primera,columna:central,odia_olor:todos
