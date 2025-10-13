@@ -29,52 +29,221 @@ public class Inspector {
         }
     }
     private void revisarAlLado(Asiento[][] asientos, int fila, int col, Persona persona) {
-        if (persona.getAlLado() != null) { // Valida que quiera estar al lado (o no) de alguien
-            String nombreVecino = persona.getAlLado();
-            for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento += 2) {
-                int colVecina = col + desplazamiento;
-                if (esPosicionValida(asientos, fila, colVecina)) {
-                    Persona vecino = asientos[fila][colVecina].getPersona();
-                    if (vecino != null && nombreVecino.equals(vecino.getNombre())) { // Valida si el nombre es igual al esperado
-                        persona.setEsFeliz(true);
-                    }
-                    else if (vecino != null && nombreVecino.equals("!"+vecino.getNombre())) { // Si no, valida que tenga un ! antes (no lo quiere "al_lado")
-                        persona.setEsFeliz(false);
-                    }
-                    else { // Si no la encuentra, lo pone triste
-                        persona.setEsFeliz(false);
+        String caso = persona.getAlLado();
+        if (caso != null) {
+            switch (caso) {
+                case "palomitas":
+                    revisarAlLadoPalomitas(asientos, fila, col, persona);
+                    break;
+                case "nadie":
+                    revisarAlLadoNadie(asientos, fila, col, persona);
+                    break;
+                case "infante":
+                    revisarAlLadoInfante(asientos, fila, col, persona);
+                    break;
+                case "adulto":
+                    revisarAlLadoAdulto(asientos, fila, col, persona);
+                    break;
+                default:
+                    revisarAlLadoPersona(asientos, fila, col, persona);
+                    break;
+            }
+        }
+    }
+
+    private void revisarTiene(Asiento[][] asientos, int fila, int col, Persona persona) {
+        String tiene = persona.getTiene();
+        if (tiene != null) {
+            if (tiene.contains("sombrero")) {
+                revisarTieneSombrero(asientos, fila, col, persona);
+            }
+            else if (tiene.contains("hablada")) {
+                revisarTieneHablada(asientos, fila, col, persona);
+            }
+            else if (tiene.contains("celular_encendido")) {
+                revisarTieneCelularEncendido(asientos, fila, col, persona);
+            }
+        }
+    }
+
+    private void revisarFila(Asiento[][] asientos, int fila, int col, Persona persona) {
+
+    }
+    private void revisarColumna(Asiento[][] asientos, int fila, int col, Persona persona) {
+
+    }
+    private void revisarOlor(Asiento[][] asientos, int fila, int col, Persona persona) {
+        String olor = persona.getHueleA();
+        if (olor != null) {
+            if (olor.contains("sucio")) {
+                revisarOlorSucio(asientos, fila, col, persona);
+            }
+            else if (olor.contains("perfume")) {
+                revisarOlorPerfume(asientos, fila, col, persona);
+            }
+        }
+    }
+
+    private boolean esPosicionValida(Asiento[][] asientos, int fila, int colVecina) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'esPosicionValida'");
+    }
+
+    // Métodos específicos para revisar Al Lado
+    private void revisarAlLadoPalomitas(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento += 2) {
+            int colVecina = col + desplazamiento;
+            if (esPosicionValida(asientos, fila, colVecina)) {
+                Persona vecino = asientos[fila][colVecina].getPersona();
+                if (vecino.getTiene().contains("palomitas")) {
+                    persona.setEsFeliz(true);
+                    return;
+                }
+            }
+        }
+        persona.setEsFeliz(false);
+    }
+
+    private void revisarAlLadoNadie(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento += 2) {
+            int colVecina = col + desplazamiento;
+            if (esPosicionValida(asientos, fila, colVecina)) {
+                Persona vecino = asientos[fila][colVecina].getPersona();
+                if (vecino == null) {
+                    persona.setEsFeliz(true);
+                }
+                else {
+                    persona.setEsFeliz(false);
+                }
+            }
+        }
+    }
+
+    private void revisarAlLadoInfante(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento += 2) {
+            int colVecina = col + desplazamiento;
+            if (esPosicionValida(asientos, fila, colVecina)) {
+                Persona vecino = asientos[fila][colVecina].getPersona();
+                if (vecino.getEdad() < 18) {
+                    persona.setEsFeliz(true);
+                    return;
+                }
+            }
+        }
+        persona.setEsFeliz(false);
+    }
+
+    private void revisarAlLadoAdulto(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento += 2) {
+            int colVecina = col + desplazamiento;
+            if (esPosicionValida(asientos, fila, colVecina)) {
+                Persona vecino = asientos[fila][colVecina].getPersona();
+                if (vecino.getEdad() > 18) {
+                    persona.setEsFeliz(true);
+                    return;
+                }
+            }
+        }
+        persona.setEsFeliz(false);
+    }
+
+    private void revisarAlLadoPersona(Asiento[][] asientos, int fila, int col, Persona persona) {
+        String nombreVecino = persona.getAlLado();
+        for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento += 2) {
+            int colVecina = col + desplazamiento;
+            if (esPosicionValida(asientos, fila, colVecina)) {
+                Persona vecino = asientos[fila][colVecina].getPersona();
+                if (vecino != null && nombreVecino.equals(vecino.getNombre())) { // Valida si el nombre es igual al esperado
+                    persona.setEsFeliz(true);
+                }
+                else if (vecino != null && nombreVecino.equals("!"+vecino.getNombre())) { // Si no, valida que tenga un ! antes (no lo quiere "al_lado")
+                    persona.setEsFeliz(false);
+                }
+            }
+        }
+        persona.setEsFeliz(false); // Si no encuentra a nadie, lo pone triste
+    }
+
+    // Metodos especificos para revisar Tiene
+    private void revisarTieneSombrero(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamiento = fila + 1; desplazamiento<asientos.length; desplazamiento++) {
+            Persona afectado = asientos[desplazamiento][col].getPersona();
+            if (esPosicionValida(asientos, fila, col)) {
+                if (afectado != null) {
+                    afectado.setEsFeliz(false);
+                }
+            }
+        }
+    }
+
+    private void revisarTieneHablada(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamientoX = -2; desplazamientoX <= 2; desplazamientoX++) {
+            for (int desplazamientoY = -2; desplazamientoY <= 2; desplazamientoY++) {
+                if (desplazamientoX == 0 && desplazamientoY == 0) continue;
+                int nuevaFila = fila + desplazamientoX;
+                int nuevaCol = col + desplazamientoY;
+                if (esPosicionValida(asientos, nuevaFila, nuevaCol)) {
+                    Persona afectado = asientos[nuevaFila][nuevaCol].getPersona();
+                    if (afectado != null) {
+                        if (afectado.getAlLado().equals(persona.getNombre()) || persona.getAlLado().equals(afectado.getNombre()) ) {
+                            continue;
+                        }
+                        else {
+                            afectado.setEsFeliz(false);
+                        }
                     }
                 }
             }
         }
     }
 
-    private void revisarTiene(Asiento[][] asientos, int fila, int col, Persona persona) {
-
-    }
-    private void revisarFila(Asiento[][] asientos, int fila, int col, Persona persona) {
-        String condicionFila = persona.getFila();
-        if (condicionFila == null) return;
-
-        int numeroFila = fila + 1; // Fila lógica (1-indexada)
-        if (condicionFila.startsWith("!")) {
-            int filaProhibida = Integer.parseInt(condicionFila.substring(1));
-            if (numeroFila != filaProhibida) persona.setEsFeliz(true);
-            else persona.setEsFeliz(false);
-        } else {
-            int filaDeseada = Integer.parseInt(condicionFila);
-            persona.setEsFeliz(numeroFila == filaDeseada);
+    private void revisarTieneCelularEncendido(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamiento = -1; desplazamiento <= 1; desplazamiento++) {
+            int filaAtras = fila + 1;
+            int nuevaCol = col + desplazamiento;
+            if (esPosicionValida(asientos, filaAtras, nuevaCol)) {
+                Persona afectado = asientos[filaAtras][nuevaCol].getPersona();
+                if (afectado != null) {
+                    afectado.setEsFeliz(false);
+                }
+            }
         }
     }
-    private void revisarColumna(Asiento[][] asientos, int fila, int col, Persona persona) {
 
+    // Metodos especificos para revisar Olor
+    private void revisarOlorSucio(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamientoX = -1; desplazamientoX <= 1; desplazamientoX++) {
+            for (int desplazamientoY = -1; desplazamientoY <= 1; desplazamientoY++) {
+                if (desplazamientoX == 0 && desplazamientoY == 0) continue; // Evita afectar a la misma celda (origen)
+                int nuevaFila = fila - desplazamientoX;
+                int nuevaCol = col - desplazamientoY;
+                if (esPosicionValida(asientos, nuevaFila, nuevaCol)) {
+                    Persona afectado = asientos[nuevaFila][nuevaCol].getPersona();
+                    if (afectado != null) {
+                        if (afectado.getOdiaOlor().contains("sucio") || afectado.getOdiaOlor().contains("todos")) {
+                            afectado.setEsFeliz(false);
+                        }
+                    }
+                }
+            }
+        }
     }
-    private void revisarOlor(Asiento[][] asientos, int fila, int col, Persona persona) {
 
-    }
-
-    private boolean esPosicionValida(Asiento[][] asientos, int fila, int colVecina) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'esPosicionValida'");
+    private void revisarOlorPerfume(Asiento[][] asientos, int fila, int col, Persona persona) {
+        for (int desplazamientoX = -1; desplazamientoX <= 1; desplazamientoX++) {
+            for (int desplazamientoY = -1; desplazamientoY <= 1; desplazamientoY++) {
+                if (desplazamientoX == 0 && desplazamientoY == 0) continue; // Evita afectar a la misma celda (origen)
+                int nuevaFila = fila + desplazamientoX;
+                int nuevaCol = col + desplazamientoY;
+                if (esPosicionValida(asientos, nuevaFila, nuevaCol)) {
+                    Persona afectado = asientos[nuevaFila][nuevaCol].getPersona();
+                    if (afectado != null) {
+                        if (afectado.getOdiaOlor().contains("perfume") || afectado.getOdiaOlor().contains("todos")) {
+                            afectado.setEsFeliz(false);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
