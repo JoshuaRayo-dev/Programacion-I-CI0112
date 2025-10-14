@@ -1,75 +1,121 @@
 public class Sala {
-    
+
     private String parametros;
     private int filas; //Parámetro A
     private int columnas; //Parámetro B
     private int pasillos;  //Parámetro C
     private Asiento[][] asientos;
 
-    public Sala(String parametros) {
+    public Sala(String argumentos) {
         try {
-            this.parametros = parametros;
-            // Arreglo con los parametros divididos por cada "x"
-            String[] parametrosDivididos = parametros.split("x");
-            if (parametrosDivididos.length < 2) {
-            throw new IllegalArgumentException("Debe especificar al menos filas y columnas.");
-            }
-
-            // Array tipo int para almacenar los parametros luego parseados
-            int[] parametrosParseados = new int[parametrosDivididos.length];
-
-            // Convierte los strings a ints
-            for (int i=0; i<parametrosDivididos.length; i++) {
-                parametrosParseados[i] = Integer.parseInt(parametrosDivididos[i]);
-            }
-
-            // Asigna los valores a sus respectivos campos
-            this.filas = parametrosParseados[0];
-            this.columnas = parametrosParseados[1];
-            if (parametrosParseados.length == 3) {
-                this.pasillos = parametrosParseados[2];
+            int[] parametros = parsearParametros(argumentos);
+            this.filas = parametros[0];
+            this.columnas = parametros[1];
+            if (parametros.length > 2) {
+                this.pasillos = parametros[2];
             }
             else {
                 this.pasillos = 0;
             }
 
-            // Evita que haya parametros negativos
-            if (filas < 0 || columnas < 0 || pasillos < 0) {
-                throw new IllegalArgumentException("No pueden haber parámetros negativos. Sea más cuidadoso.");
-            }
-
-            // Evita que haya mas pasillos que columnas
-            if (pasillos >= columnas) {
-                System.out.println("No puede haber mas pasillos que columnas.\nInicializando pasillos en 0.");
-                this.pasillos = 0;
-            }
-
-            // Define cuantos bloques hay y cual va a ser su tamano
-            int bloques = pasillos+1;
-            int tamanoBloque = columnas/bloques;
-
-            // Inicializar matriz (de momento sin pasillos)
-            asientos = new Asiento[filas][columnas];
-            for (int i = 0; i < filas; i++) {
-                for (int j = 0; j < columnas; j++) {
-                    asientos[i][j] = new Asiento(false);
-                }
-            }
-            
-            // Coloca los pasillos
-            for (int i = 1; i <= pasillos; i++) {
-                int columnaPasillo = tamanoBloque * i + (i - 1);
-                for (int fila = 0; fila < filas; fila++) {
-                    asientos[fila][columnaPasillo] = new Asiento(true);
-                }
-            }
+            validarParametros();
+            inicializarAsientos();
+            colocarPasillos();
+            establecerCentrales();
         }
         catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("El número de pasillos frente a las columnas ha causado desbordamiento.");
-            System.out.println("Dividiento la sala en las partes iguales más cercanas.");
+            System.out.println("Ha ocurrido un error de desbordamiento." + e.getMessage() + "\nDividiendo la sala en partes iguales más cercanas.");
         }
         catch(Exception e) {
-            System.out.println("Un error inesperado ha ocurrido.");
+            System.out.println("Un error inesperado ha ocurrido." + e.getMessage());
+        }
+    }
+
+    // Metodos exclusivos para el constructor
+    private int[] parsearParametros(String parametros) {
+        try {
+            String[] partes = parametros.split("x");
+
+            if (partes.length < 2) {
+                throw new IllegalArgumentException("Tiene que especificar correctamente la cantidad de filas y columnas.");
+            }
+
+            if (partes.length > 3) {
+                throw new IllegalArgumentException("Ha indicado más de tres parámetros. Por favor, ingréselos con cuidado.");
+            }
+
+            int[] partesInt = new int[partes.length];
+
+            for (int i=0; i<partes.length; i++) {
+                partesInt[i] = Integer.parseInt(partes[i]);
+            }
+            return partesInt;
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Ha ocurrido un error procesando los parámetros. Asegurese de que sean números enteros.");
+        }
+    }
+
+    private void validarParametros() {
+        if (filas < 0 || columnas < 0 || pasillos < 0) {
+            throw new IllegalArgumentException("No pueden haber parámetros negativos.");
+        }
+        if (pasillos >= columnas) {
+            System.out.println("No puede haber más pasillos que columnas. Inicializando pasillos en 0.");
+            pasillos = 0;
+        }
+    }
+
+    private void inicializarAsientos() {
+        asientos = new Asiento[filas][columnas];
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                asientos[i][j] = new Asiento(false);
+            }
+        }
+    }
+
+    private void colocarPasillos() {
+        if (pasillos == 0) return;
+
+        int bloques = pasillos + 1;
+
+        // Solo si las columnas pueden dividirse equitativamente entre bloques
+        if ((columnas + 1) % bloques != 0) {
+            System.out.println("La sala no puede dividirse equitativamente en " + bloques + " bloques. No se colocarán pasillos.");
+            pasillos = 0;
+            return;
+        }
+
+        int tamanoBloque = columnas / bloques;
+        // Coloca los pasillos reemplazando columnas existentes
+        for (int i = 0; i <= pasillos; i++) {
+            int columnaPasillo = tamanoBloque * (i + 1) + i;  // índice del pasillo
+            if (columnaPasillo >= columnas) { // Evita IndexOOB
+                continue;
+            }
+            for (int fila = 0; fila < filas; fila++) {
+                asientos[fila][columnaPasillo] = new Asiento(true);
+            }
+        }
+    }
+
+    private void establecerCentrales() {
+        int centro = columnas / 2;
+        for (int fila = 0; fila < filas; fila++) {
+            // Asiento central principal
+            if (!asientos[fila][centro].getEsPasillo()) {
+                asientos[fila][centro].setEsCentral(true);
+            }
+            // Extiende hacia la izquierda
+            for (int col = centro - 1; col >= 0 && !asientos[fila][col].getEsPasillo(); col--) {
+                asientos[fila][col].setEsCentral(true);
+            }
+
+            // Extiende hacia la derecha
+            for (int col = centro + 1; col < columnas && !asientos[fila][col].getEsPasillo(); col++) {
+                asientos[fila][col].setEsCentral(true);
+            }
         }
     }
 
@@ -84,37 +130,15 @@ public class Sala {
         }
     }
 
-    public void establecerCentrales() {
-        int centro = 0;
-        if (columnas % 2 == 0)  {
-            centro = columnas / 2;
-        }
-        else {
-            centro = columnas / 2 + 1;
-        }
-        int der = centro + 1;
-        int izq = centro - 1;
-        for (int i = 0; i < asientos.length; i++) {
-            if (pasillos != 0) {
-                if (asientos[i][centro].getEsPasillo() == false) {
-                    asientos[i][centro].setEsCentral(true);
-                }
-                while (asientos[i][der].getEsPasillo() == false) {
-                    asientos[i][der].setEsCentral(true);
-                    der++;
-                }
-                while (asientos[i][izq].getEsPasillo() == false) {
-                    asientos[i][izq].setEsCentral(true);
-                    i--;
-                }
-            }
-            else {
-                asientos[i][centro].setEsCentral(true);
-            }
-        }
-    }
-
     public Asiento[][] getAsientos() {
         return this.asientos;
+    }
+
+    public int getFilas() {
+        return this.filas;
+    }
+
+    public int getColumnas() {
+        return this.columnas;
     }
 }

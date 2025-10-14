@@ -9,9 +9,30 @@ public class Inspector {
         this.cantidadAlegres = 0;
         this.cantidadTristes = 0;
     }
+
+    // Getters de campos
+
+    public int getCantidadAlegres() {
+        return this.cantidadAlegres;
+    }
+
+    public int getCantidadTristes() {
+        return this.cantidadTristes;
+    }
+
+    public Persona[] getListaPersonas() {
+        return this.listaPersonas;
+    }
+
     // Metodo general de inspeccion
+    // Nota: Cuando el caso es feliz(no afecta o es neutro) decidí no llamar a setEstadoAlegria, evita redundancias innecesarias.
     public void inspeccionarSala(Sala sala) {
         Asiento[][] asientos = sala.getAsientos();
+
+        cantidadAlegres = 0;
+        cantidadTristes = 0;
+
+        // Primera pasada, realiza un inspección general y hace cambios (feliz o triste)
         for (int fila = 0; fila < asientos.length; fila++) {
             for (int col = 0; col < asientos[fila].length; col++) {
 
@@ -19,12 +40,29 @@ public class Inspector {
                 Persona persona = asiento.getPersona();
 
                 if (!(asiento.getEsPasillo() || persona == null)) {
-
                     revisarAlLado(asientos, fila, col, persona);
                     revisarTiene(asientos, fila, col, persona);
                     revisarFila(asientos, fila, col, persona);
                     revisarColumna(asientos, fila, col, persona);
                     revisarOlor(asientos, fila, col, persona);
+                }
+            }
+        }
+
+        // Segunda pasada, solo ve quien está feliz o triste y los cuenta.
+        for (int fila = 0; fila < asientos.length; fila++) {
+            for (int col = 0; col < asientos[fila].length; col++) {
+
+                Asiento asiento = asientos[fila][col];
+                Persona persona = asiento.getPersona();
+
+                if (!(asiento.getEsPasillo() || persona == null)) {
+                    if (persona.getEsFeliz()) {
+                        cantidadAlegres++;
+                    }
+                    else {
+                        cantidadTristes++;
+                    }
                 }
             }
         }
@@ -76,7 +114,6 @@ public class Inspector {
                 int intFilaDeseada = Integer.parseInt(filaDeseada);
                 if (intFilaDeseada - 1 == fila) {
                     // caso feliz
-                    persona.setEstadoAlegria(null, 0);
                 }
                 else {
                     // caso triste
@@ -99,7 +136,6 @@ public class Inspector {
                 }
                 else {
                     // caso feliz
-                    persona.setEstadoAlegria(null, 0);
                 }
             }
             else if (filaDeseada.length() > 2 && filaDeseada.equals("!primera")) {
@@ -109,8 +145,6 @@ public class Inspector {
                 }
                 else {
                     // caso feliz
-                    persona.setEstadoAlegria(null, 0);
-
                 }
             }
         }
@@ -118,11 +152,13 @@ public class Inspector {
 
     private void revisarColumna(Asiento[][] asientos, int fila, int col, Persona persona) {
         String columnaARevisar = persona.getColumna();
-        if (columnaARevisar.contains("central")) {
-            revisarColumnaCentral(asientos, fila, col, persona);
-        }
-        else if (columnaARevisar.contains("pasillo")) {
-            revisarColumnaPasillo(asientos, fila, col, persona);
+        if(columnaARevisar != null) {
+            if (columnaARevisar.contains("central")) {
+                revisarColumnaCentral(asientos, fila, col, persona);
+            }
+            else if (columnaARevisar.contains("pasillo")) {
+                revisarColumnaPasillo(asientos, fila, col, persona);
+            }
         }
     }
 
@@ -174,7 +210,6 @@ public class Inspector {
                 Persona vecino = asientos[fila][colVecina].getPersona();
                 if (vecino.getTiene().contains("palomitas")) {
                     // caso feliz, solo basta encontrar 1
-                    persona.setEstadoAlegria(null, 0);
                     return;
                 }
             }
@@ -194,9 +229,9 @@ public class Inspector {
                     // caso feliz
                 }
                 else {
-                    // caso triste
+                    // caso triste, basta solo con 1
                     persona.setEstadoAlegria("(triste):al_lado:nadie(" + vecinos + ")", 1);
-
+                    return;
                 }
             }
         }
@@ -244,6 +279,7 @@ public class Inspector {
                 Persona vecino = asientos[fila][colVecina].getPersona();
                 if (vecino != null && nombreVecino.equals(vecino.getNombre())) { // Valida si el nombre es igual al esperado
                     // Caso Feliz;
+                    return;
                 }
                 else if (vecino != null && nombreVecino.equals("!"+vecino.getNombre())) { // Si no, valida que tenga un ! antes (no lo quiere "al_lado")
                     // Caso Triste
@@ -260,12 +296,11 @@ public class Inspector {
     // Metodos especificos para revisar Tiene
     private void revisarTieneSombrero(Asiento[][] asientos, int fila, int col, Persona persona) {
         for (int desplazamiento = fila + 1; desplazamiento<asientos.length; desplazamiento++) {
-            Persona afectado = asientos[desplazamiento][col].getPersona();
             if (esPosicionValida(asientos, desplazamiento, col)) {
+                Persona afectado = asientos[desplazamiento][col].getPersona();
                 if (afectado != null) {
                     // Caso triste
                     afectado.setEstadoAlegria("(triste):tiene:sombrero(" + persona.getNombre() + ")", 1);
-
                 }
             }
         }
@@ -305,7 +340,6 @@ public class Inspector {
                 if (afectado != null) {
                     // Caso triste
                     afectado.setEstadoAlegria("(triste):tiene:celular_encendido(" + persona.getNombre() + ")", 1);
-
                 }
             }
         }
@@ -329,11 +363,11 @@ public class Inspector {
         }
         else if (colCentral.equals("!central")) {
             if (esteAsiento.getEsCentral()) {
-                // Caso Trise
+                // Caso Triste
                 persona.setEstadoAlegria("(triste):columna:" + colCentral + "(columna:" + col + ")", 1);
             }
             else {
-                // Caso Feliz;
+                // Caso Feliz
             }
         }
     }
@@ -350,16 +384,19 @@ public class Inspector {
                         return;
                     }
                     else {
-                        // Caso Trise
+                        // Caso Triste
+                        persona.setEstadoAlegria("(triste):columna:" + colPasillo + "(columna:" + col + ")", 1);
                     }
                 }
                 else if (colPasillo.equals("!pasillo")) {
                     if (vecino.getEsPasillo()) {
-                        // Caso Trise
+                        // Caso Triste
+                        persona.setEstadoAlegria("(triste):columna:" + colPasillo + "(columna:" + col + ")", 1);
                         return;
                     }
                     else {
                         // Caso Feliz;
+                        
                     }
                 }
             }
@@ -402,7 +439,6 @@ public class Inspector {
                             if (afectado.getOdiaOlor().contains("perfume") || afectado.getOdiaOlor().contains("todos")) {
                                 // Caso triste
                                 afectado.setEstadoAlegria("(triste):huele_a:" + persona.getHueleA() + "(" + persona.getNombre() + ")", 1);
-
                             }
                         }
                     }

@@ -15,16 +15,9 @@ public class Persona {
     public Persona() {
         this.variableAlegria = 0;
         this.datos = new String[10];
-        this.nombre = "";
         this.edad = 1;
-        this.fila = "";
-        this.columna = "";
-        this.huele_a = "";
-        this.tiene = "";
-        this.al_lado = "";
-        this.odia_olor = "";
         this.problemas = 0;
-        this.esFeliz = false;
+        this.esFeliz = true;
     }
 
     // Setters
@@ -102,6 +95,16 @@ public class Persona {
     }
     public boolean getEsFeliz() {
         return this.esFeliz;
+    }
+
+    public String getEstadoAlegria() {
+        String elDato = "";
+        for (int i = 0; i < this.datos.length; i++) {
+            if (this.datos[i] != null) {
+                elDato = (this.datos[i]+"\n");
+            }
+        }
+        return elDato;
     }
 
     // Metodos relacionados al inspector

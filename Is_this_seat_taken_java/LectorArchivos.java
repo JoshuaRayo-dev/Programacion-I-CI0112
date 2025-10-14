@@ -91,6 +91,58 @@ public class LectorArchivos
         }
     }
 
+    public static String[][] leerDistribucion(String archivoDistribucion) {
+        BufferedReader br = null;
+        String[][] distribucion = new String[100][100]; // Tamaño arbitrario, la verdad no se me ocurre otra manera de crearlo
+        int fila = 0;
+        try {
+            br = new BufferedReader(new FileReader(archivoDistribucion));
+            String linea;
+            while ((linea = br.readLine()) != null && fila < distribucion.length) {
+            // Elimina ese "?" molesto al leer el csv
+            linea = linea.trim();
+            if (fila == 0 && linea.startsWith("\uFEFF")) {
+                linea = linea.substring(1);
+            }
+                String[] partes = linea.split(",", -1);
+                for (int col = 0; col < partes.length && col < distribucion[fila].length; col++) {
+                    String nombre = partes[col].trim();
+                    if (!nombre.isEmpty()) {
+                        distribucion[fila][col] = nombre;
+                    }
+                    else {
+                    distribucion[fila][col] = null; // para mantener orden
+                    }
+                }
+            fila++;
+            }
+        } 
+        catch(FileNotFoundException e) 
+        {
+            System.out.println("Archivo no encontrado: " + e.getMessage());            
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
+        } 
+        finally 
+        {
+            // Cerrar el BufferedReader si se abrió
+            if (br != null) 
+            {
+                try 
+                {
+                    br.close();
+                } 
+                catch (IOException e) 
+                {
+                    System.out.println("Error al cerrar el archivo: " + e.getMessage());
+                }
+            }
+        }
+        return distribucion;
+    }
+
     // Getters
     public static Persona[] getPersonas() {
         return personas;
