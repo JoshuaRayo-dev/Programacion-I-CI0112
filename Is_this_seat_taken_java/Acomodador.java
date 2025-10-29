@@ -51,7 +51,6 @@ public class Acomodador {
                             break;
                         }
                     }
-
                     if (personaAcomodar != null) {
                         acomodar(sala, personaAcomodar, inspector, fila, columna);
                     } else {
